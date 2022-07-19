@@ -1,7 +1,10 @@
 #include <iostream>
 #include <utility>
 #include <vector>
+#include <string>
 #include <algorithm>
+#include <fstream>
+#include <sstream>
 
 static bool abs_compare(int a, int b) {
     return (std::abs(a) < std::abs(b));
@@ -60,6 +63,7 @@ public:
     }
 
     ~Matrix() {
+        m->clear();
         delete m;
     }
 
@@ -355,6 +359,42 @@ public:
         return max_values[index];
     }
 
+    void read_csv(const char *filename, const char delim) {
+
+        std::ifstream file;
+        file.open(filename, std::ifstream::in);
+
+        if (!file.is_open()) {
+            std::cerr << "error while opening the file " << filename << std::endl;
+            std::exit(-1);
+        }
+
+        if (m == nullptr)
+            m = new std::vector<std::vector<double>>;
+
+        std::string line, word;
+        std::vector<double> row;
+
+        while (file >> line) {
+
+            std::stringstream s(line);
+            row.clear();
+
+            while (std::getline(s, word, delim)) {
+
+                if (!word.empty())
+                    row.push_back(std::stod(word));
+            }
+            m->push_back(row);
+        }
+
+        rows = m->size();
+        cols = row.size();
+
+        file.close();
+
+    }
+
 };
 
 Matrix eye(size_t s) {
@@ -430,22 +470,16 @@ Matrix vconcat(Matrix &A, Matrix &B) {
 
 int main() {
 
-    std::vector<double> a = {1,2,3};
-    std::vector<double> b = {4,5,6};
-    std::vector<double> c = {7,8,9};
+    Matrix A;
+    A.read_csv("ex.csv", ',');
 
-    std::vector<std::vector<double>> v;
-    v.push_back(a);
-    v.push_back(b);
-    v.push_back(c);
-
-    Matrix A(v);
-    Matrix B = A;
-
-    std::cout << A.maxval() << std::endl;
+    std::cout << A << std::endl;
+    std::cout << A.shape().first << A.shape().second << std::endl;
 
 }
 
 // TODO: написать оператор << для удобства записи матрицы
 // TODO: исключения на отрицательные индексы матрицы и from-upto construction
 // TODO: вынести friends за класс
+// TODO: добавить sep в конструктор
+// TODO: добавить исключение в read_csv на неравное количество столбцов в csv
