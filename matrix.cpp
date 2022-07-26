@@ -63,7 +63,7 @@ public:
     }
 
     ~Matrix() {
-        m->clear();
+//        m->clear();
         delete m;
     }
 
@@ -298,7 +298,7 @@ public:
 
         for (auto i = 0; i < M.rows; ++i) {
             for (auto j = from; j < upto; ++j) {
-                M[i][j-from] = m->at(i)[j];
+                M[i][j - from] = m->at(i)[j];
             }
         }
 
@@ -330,7 +330,7 @@ public:
         Matrix mid(upto - from, 1);
 
         for (size_t i = from; i < upto; ++i) {
-            mid[i-from][0] = m->at(i)[index];
+            mid[i - from][0] = m->at(i)[index];
         }
 
         return mid;
@@ -471,15 +471,12 @@ Matrix vconcat(Matrix &A, Matrix &B) {
 int main() {
 
     Matrix A;
-    A.read_csv("ex.csv", ',');
-
-    std::cout << A << std::endl;
-    std::cout << A.shape().first << A.shape().second << std::endl;
+    A.read_csv("table_3_1.csv", ',');
 
 }
 
 // TODO: написать оператор << для удобства записи матрицы
 // TODO: исключения на отрицательные индексы матрицы и from-upto construction
 // TODO: вынести friends за класс
-// TODO: добавить sep в конструктор
 // TODO: добавить исключение в read_csv на неравное количество столбцов в csv
+// TODO: подумать над деструктором (очистка вектора), а то падает Хаф
