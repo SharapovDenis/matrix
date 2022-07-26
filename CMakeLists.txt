@@ -8,4 +8,4 @@ include_directories(.)
 add_executable(matrix
         matrix.cpp
         matrix.hpp
-        ex.csv)
+        hough.cpp)
