@@ -17,7 +17,7 @@ Matrix::Matrix(const Matrix &M) {
     m = M.m;
 }
 
-Matrix::~Matrix() {}
+Matrix::~Matrix() = default;
 
 Matrix &Matrix::operator=(const Matrix &M) {
 
@@ -36,7 +36,6 @@ Matrix &Matrix::operator=(Matrix &&M) noexcept {
     if (this == &M) {
         return *this;
     }
-
     std::swap(rows, M.rows);
     std::swap(cols, M.cols);
     std::swap(m, M.m);
@@ -160,21 +159,6 @@ bool Matrix::is_empty() {
         return true;
     else
         return false;
-}
-
-void Matrix::print() {
-
-    if (rows == 0 && cols == 0) {
-        std::cout << "empty matrix!" << std::endl;
-        return;
-    }
-
-    for (auto i = 0; i < rows; ++i) {
-        for (auto j = 0; j < cols; ++j) {
-            std::cout << m[i][j] << " ";
-        }
-        std::cout << std::endl;
-    }
 }
 
 std::pair<size_t, size_t> Matrix::shape() {
@@ -405,13 +389,19 @@ int main() {
     Matrix A;
     Matrix B = eye(4);
     Matrix C, D;
-    Matrix E = D = C = B;
+    D = C = B;
+
+    B += B;
+
+    std::cout << B << C << D << std::endl;
+
     A.read_csv("table_3_1.csv", ',');
     std::cout << A.shape().first << " " << A.shape().second << std::endl;
-    std::cout << B << C << D << E << std::endl;
+
 }
 
 // TODO: написать оператор << для удобства записи матрицы
 // TODO: исключения на отрицательные индексы матрицы и from-upto construction
 // TODO: добавить исключение в read_csv на неравное количество столбцов в csv
 // TODO: подумать над деструктором (очистка вектора), а то падает Хаф
+// TODO: использовать reserve для push_back, чтобы не было лишнего копирования
