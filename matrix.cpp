@@ -4,70 +4,29 @@ static bool abs_compare(int a, int b) {
     return (std::abs(a) < std::abs(b));
 }
 
-Matrix::Matrix() : rows(0), cols(0), m(nullptr) {}
+Matrix::Matrix() : rows(0), cols(0) {}
 
 Matrix::Matrix(size_t rows, size_t cols) : rows(rows), cols(cols) {
-    m = new std::vector<std::vector<double>>(rows, std::vector<double>(cols));
-    for (auto i = 0; i < rows; ++i) {
-        for (auto j = 0; j < cols; ++j) {
-            m->at(i)[j] = 0;
-        }
-    }
+    std::vector<double> tmp(cols, 0);
+    m.assign(rows, tmp);
 }
 
 Matrix::Matrix(const Matrix &M) {
     rows = M.rows;
     cols = M.cols;
-
-    m = new std::vector<std::vector<double>>(rows, std::vector<double>(cols));
-
-    for (auto i = 0; i < rows; ++i) {
-        for (auto j = 0; j < cols; ++j) {
-            m->at(i)[j] = M[i][j];
-        }
-    }
+    m = M.m;
 }
 
-Matrix::Matrix(const std::vector<std::vector<double>> &ptr) {
-    rows = ptr.size();
-
-    if (rows != 0) {
-        cols = ptr[0].size();
-    } else {
-        rows = 0;
-    }
-
-    m = new std::vector<std::vector<double>>(rows, std::vector<double>(cols));
-
-    for (auto i = 0; i < rows; ++i) {
-        for (auto j = 0; j < cols; ++j) {
-            m->at(i)[j] = ptr[i][j];
-        }
-    }
-}
-
-Matrix::~Matrix() {
-//        m->clear();
-    delete m;
-}
+Matrix::~Matrix() {}
 
 Matrix &Matrix::operator=(const Matrix &M) {
 
     if (this == &M) {
         return *this;
     }
-
-    delete m;
-
     rows = M.rows;
     cols = M.cols;
-    m = new std::vector<std::vector<double>>(rows, std::vector<double>(cols));
-
-    for (auto i = 0; i < rows; ++i) {
-        for (auto j = 0; j < cols; ++j) {
-            m->at(i)[j] = M[i][j];
-        }
-    }
+    m = M.m;
 
     return *this;
 }
@@ -78,11 +37,9 @@ Matrix &Matrix::operator=(Matrix &&M) noexcept {
         return *this;
     }
 
-    delete m;
-
-    m = std::exchange(M.m, nullptr);
-    rows = std::exchange(M.rows, 0);
-    cols = std::exchange(M.cols, 0);
+    std::swap(rows, M.rows);
+    std::swap(cols, M.cols);
+    std::swap(m, M.m);
 
     return *this;
 
@@ -102,7 +59,7 @@ Matrix &Matrix::operator+=(const Matrix &M) {
 
     for (auto i = 0; i < rows; ++i) {
         for (auto j = 0; j < cols; ++j) {
-            m->at(i)[j] += M[i][j];
+            m[i][j] += M[i][j];
         }
     }
 
@@ -128,7 +85,7 @@ Matrix &Matrix::operator-=(const Matrix &M) {
 
     for (auto i = 0; i < rows; ++i) {
         for (auto j = 0; j < cols; ++j) {
-            m->at(i)[j] -= M[i][j];
+            m[i][j] -= M[i][j];
         }
     }
 
@@ -152,7 +109,7 @@ Matrix &Matrix::operator*=(const Matrix &M) {
     for (auto i = 0; i < rows; ++i) {
         for (auto j = 0; j < M.cols; ++j) {
             for (auto r = 0; r < M.rows; ++r) {
-                tmp[i][j] += m->at(i)[r] * M[r][j];
+                tmp[i][j] += m[i][r] * M[r][j];
             }
         }
     }
@@ -174,11 +131,11 @@ const Matrix operator*(Matrix A, const Matrix &B) { // NOLINT(readability-const-
 }
 
 std::vector<double> &Matrix::operator[](int i) {
-    return m->at(i);
+    return m[i];
 }
 
 const std::vector<double> &Matrix::operator[](int i) const {
-    return m->at(i);
+    return m[i];
 }
 
 std::ostream &operator<<(std::ostream &os, const Matrix &M) {
@@ -190,7 +147,7 @@ std::ostream &operator<<(std::ostream &os, const Matrix &M) {
 
     for (auto i = 0; i < M.rows; ++i) {
         for (auto j = 0; j < M.cols; ++j) {
-            std::cout << M.m->at(i)[j] << " ";
+            std::cout << M.m[i][j] << " ";
         }
         std::cout << std::endl;
     }
@@ -214,7 +171,7 @@ void Matrix::print() {
 
     for (auto i = 0; i < rows; ++i) {
         for (auto j = 0; j < cols; ++j) {
-            std::cout << m->at(i)[j] << " ";
+            std::cout << m[i][j] << " ";
         }
         std::cout << std::endl;
     }
@@ -243,7 +200,7 @@ Matrix &Matrix::colchange(Matrix &col, size_t index) {
     }
 
     for (auto i = 0; i < col.rows; ++i) {
-        m->at(i)[index] = col[i][0];
+        m[i][index] = col[i][0];
     }
 
     return *this;
@@ -266,7 +223,7 @@ Matrix Matrix::getcols(size_t from, size_t upto) {
         Matrix M(rows, 1);
 
         for (auto i = 0; i < rows; ++i) {
-            M[i][0] = m->at(i)[index];
+            M[i][0] = m[i][index];
         }
 
         return M;
@@ -276,7 +233,7 @@ Matrix Matrix::getcols(size_t from, size_t upto) {
 
     for (auto i = 0; i < M.rows; ++i) {
         for (auto j = from; j < upto; ++j) {
-            M[i][j - from] = m->at(i)[j];
+            M[i][j - from] = m[i][j];
         }
     }
 
@@ -308,7 +265,7 @@ Matrix Matrix::slice(size_t from, size_t upto, size_t index) {
     Matrix mid(upto - from, 1);
 
     for (size_t i = from; i < upto; ++i) {
-        mid[i - from][0] = m->at(i)[index];
+        mid[i - from][0] = m[i][index];
     }
 
     return mid;
@@ -326,9 +283,9 @@ double Matrix::maxval() {
     size_t index;
 
     for (auto i = 0; i < rows; ++i) {
-        result = std::max_element(m->at(i).begin(), m->at(i).end(), abs_compare);
-        index = std::distance(m->at(i).begin(), result);
-        max_values.push_back(m->at(i)[index]);
+        result = std::max_element(m[i].begin(), m[i].end(), abs_compare);
+        index = std::distance(m[i].begin(), result);
+        max_values.push_back(m[i][index]);
     }
 
     result = std::max_element(max_values.begin(), max_values.end(), abs_compare);
@@ -347,8 +304,7 @@ void Matrix::read_csv(const char *filename, const char delim) {
         std::exit(-1);
     }
 
-    if (m == nullptr)
-        m = new std::vector<std::vector<double>>;
+    m.clear();
 
     std::string line, word;
     std::vector<double> row;
@@ -363,10 +319,10 @@ void Matrix::read_csv(const char *filename, const char delim) {
             if (!word.empty())
                 row.push_back(std::stod(word));
         }
-        m->push_back(row);
+        m.push_back(row);
     }
 
-    rows = m->size();
+    rows = m.size();
     cols = row.size();
 
     file.close();
@@ -430,11 +386,11 @@ Matrix vconcat(Matrix &A, Matrix &B) {
     Matrix C(0, 0);
 
     for (auto i = 0; i < A.rows; ++i) {
-        C.m->push_back(A[i]);
+        C.m.push_back(A[i]);
     }
 
     for (auto i = 0; i < B.rows; ++i) {
-        C.m->push_back(B[i]);
+        C.m.push_back(B[i]);
     }
 
     C.rows = A.rows + B.rows;
@@ -447,14 +403,15 @@ Matrix vconcat(Matrix &A, Matrix &B) {
 int main() {
 
     Matrix A;
+    Matrix B = eye(4);
+    Matrix C, D;
+    Matrix E = D = C = B;
     A.read_csv("table_3_1.csv", ',');
     std::cout << A.shape().first << " " << A.shape().second << std::endl;
-    A *= A;
-
+    std::cout << B << C << D << E << std::endl;
 }
 
 // TODO: написать оператор << для удобства записи матрицы
 // TODO: исключения на отрицательные индексы матрицы и from-upto construction
-// TODO: вынести friends за класс
 // TODO: добавить исключение в read_csv на неравное количество столбцов в csv
 // TODO: подумать над деструктором (очистка вектора), а то падает Хаф
