@@ -62,6 +62,8 @@ public:
 
     friend std::ostream &operator<<(std::ostream &os, const Matrix &M);
 
+    friend Matrix &operator<<(Matrix &, std::initializer_list<double>);
+
     friend Matrix eye(size_t s);
 
     friend Matrix hconcat(Matrix &A, Matrix &B);

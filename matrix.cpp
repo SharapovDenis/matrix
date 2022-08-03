@@ -144,21 +144,26 @@ std::ostream &operator<<(std::ostream &os, const Matrix &M) {
         return os;
     }
 
-    for (auto i = 0; i < M.rows; ++i) {
-        for (auto j = 0; j < M.cols; ++j) {
-            std::cout << M.m[i][j] << " ";
+    for (const auto &ptr : M.m) {
+        for (const auto &p : ptr) {
+            os << p << " ";
         }
-        std::cout << std::endl;
+        os << std::endl;
     }
 
     return os;
 }
 
+Matrix &operator<<(Matrix &M, std::initializer_list<double> _list) {
+
+    if (M.is_empty()) {
+//        M.m.emplace_back(_list);
+    }
+
+}
+
 bool Matrix::is_empty() {
-    if (rows == 0 && cols == 0)
-        return true;
-    else
-        return false;
+    return m.empty();
 }
 
 std::pair<size_t, size_t> Matrix::shape() {
@@ -388,15 +393,11 @@ int main() {
 
     Matrix A;
     Matrix B = eye(4);
-    Matrix C, D;
-    D = C = B;
 
-    B += B;
+    std::cout << B*B << std::endl;
 
-    std::cout << B << C << D << std::endl;
-
-    A.read_csv("table_3_1.csv", ',');
-    std::cout << A.shape().first << " " << A.shape().second << std::endl;
+//    A.read_csv("table_3_1.csv", ',');
+//    std::cout << A.shape().first << " " << A.shape().second << std::endl;
 
 }
 
