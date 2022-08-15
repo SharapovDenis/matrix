@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <fstream>
 #include <sstream>
+#include <thread>
 
 static bool abs_compare(int a, int b);
 
@@ -54,6 +55,8 @@ public:
 
     void read_csv(const char *filename, const char delim);
 
+    void append(const std::initializer_list<double> &);
+
     friend const Matrix operator+(Matrix A, const Matrix &B);
 
     friend const Matrix operator-(Matrix A, const Matrix &B);
@@ -62,12 +65,15 @@ public:
 
     friend std::ostream &operator<<(std::ostream &os, const Matrix &M);
 
-    friend Matrix &operator<<(Matrix &, std::initializer_list<double>);
-
     friend Matrix eye(size_t s);
 
     friend Matrix hconcat(Matrix &A, Matrix &B);
 
     friend Matrix vconcat(Matrix &A, Matrix &B);
 
+    ///////////////////////////////////////////////////
+
+    friend Matrix mul(Matrix &, Matrix &);
+
+    friend void test_mul(Matrix &A, Matrix &B);
 };

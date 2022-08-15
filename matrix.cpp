@@ -154,14 +154,6 @@ std::ostream &operator<<(std::ostream &os, const Matrix &M) {
     return os;
 }
 
-Matrix &operator<<(Matrix &M, std::initializer_list<double> _list) {
-
-    if (M.is_empty()) {
-//        M.m.emplace_back(_list);
-    }
-
-}
-
 bool Matrix::is_empty() {
     return m.empty();
 }
@@ -318,6 +310,25 @@ void Matrix::read_csv(const char *filename, const char delim) {
 
 }
 
+void Matrix::append(const std::initializer_list<double> &_list) {
+
+    if (_list.size() == 0) {
+        return;
+    }
+
+    if (m.empty()) {
+        cols = _list.size();
+    }
+
+    if (cols != _list.size()) {
+        std::cerr << "append(): bad shapes!" << std::endl;
+        std::exit(-1);
+    }
+
+    m.emplace_back(std::vector<double>(_list));
+    rows += 1;
+}
+
 Matrix eye(size_t s) {
 
     Matrix M(s, s);
@@ -388,21 +399,30 @@ Matrix vconcat(Matrix &A, Matrix &B) {
     return C;
 }
 
+////////////////////////////////////
+
+Matrix mul(Matrix &A, Matrix &B) {
+    Matrix C(A.rows, B.cols);
+}
 
 int main() {
 
     Matrix A;
+    A.append({1, 2, 3, 4});
+    A.append({5, 6, 7, 8});
+
     Matrix B = eye(4);
 
-    std::cout << B*B << std::endl;
+    std::cout << A << std::endl;
+    std::cout << A.shape().first << " " << A.shape().second << std::endl;
 
 //    A.read_csv("table_3_1.csv", ',');
 //    std::cout << A.shape().first << " " << A.shape().second << std::endl;
 
 }
 
-// TODO: написать оператор << для удобства записи матрицы
 // TODO: исключения на отрицательные индексы матрицы и from-upto construction
 // TODO: добавить исключение в read_csv на неравное количество столбцов в csv
 // TODO: подумать над деструктором (очистка вектора), а то падает Хаф
 // TODO: использовать reserve для push_back, чтобы не было лишнего копирования
+// TODO: попробовать использовать std::move для векторов и строк
