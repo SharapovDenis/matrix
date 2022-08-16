@@ -77,22 +77,13 @@ public:
 
     friend Matrix vconcat(Matrix &A, Matrix &B);
 
-    friend class Row;
-
-//    friend test_mul(Matrix &, Matrix &);
+    friend void test_mul(Matrix &, Matrix &);
 
 };
 
-class Row {
+double multiply(std::vector<double> &, std::vector<double> &);
 
-private:
-
+struct ThrRow {
     size_t idx;
-    Matrix row;
-
-public:
-
-    Row(std::vector<double> &, size_t);
-    ~Row();
-
+    std::vector<double> *row;
 };

@@ -439,12 +439,21 @@ Matrix multiply(const Matrix &A, const Matrix &B) {
     return tmp;
 }
 
-Row::Row(std::vector<double> &_row, size_t _idx) {
-    this->idx = _idx;
-    this->row = Matrix(_row);
-}
+double multiply(const std::vector<double> &a, const std::vector<double> &b) {
 
-Row::~Row() = default;
+    if (a.size() != b.size()) {
+        std::cerr << "multiply() incorrect vector sizes" << std::endl;
+        std::exit(-1);
+    }
+
+    double tmp = 0;
+
+    for (size_t i = 0; i < a.size(); ++i) {
+        tmp += a[i] * b[i];
+    }
+
+    return tmp;
+}
 
 //void row_col_multiply(threadsafe_stack<std::vector<double>*> *rows, Matrix &B, Matrix &C) {
 //
@@ -455,11 +464,12 @@ Row::~Row() = default;
 //
 //}
 //
+//
 //void test_mul(Matrix &A, Matrix &B) {
 //
 //    Matrix C(A.rows, B.cols);
 //    const int num_threads = 4;
-//    threadsafe_stack<std::vector<Row>> rows;
+//    threadsafe_stack<std::vector<ThrRow>> rows;
 //    std::vector<std::thread> threads;
 //
 //    for (auto ptr = A.m.rbegin(); ptr != A.m.rend(); ++ptr) {
@@ -473,7 +483,6 @@ Row::~Row() = default;
 //    for (size_t i = 0; i < num_threads; ++i) {
 //        threads[i].join();
 //    }
-//
 //
 //}
 
