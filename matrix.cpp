@@ -1,4 +1,5 @@
 #include "matrix.hpp"
+#include "safe_structures.cpp"
 
 static bool abs_compare(int a, int b) {
     return (std::abs(a) < std::abs(b));
@@ -9,6 +10,12 @@ Matrix::Matrix() : rows(0), cols(0) {}
 Matrix::Matrix(size_t rows, size_t cols) : rows(rows), cols(cols) {
     std::vector<double> tmp(cols, 0);
     m.assign(rows, tmp);
+}
+
+Matrix::Matrix(std::vector<double> &row) {
+    rows = 1;
+    cols = row.size();
+    m.assign(1, row);
 }
 
 Matrix::Matrix(const Matrix &M) {
@@ -399,22 +406,83 @@ Matrix vconcat(Matrix &A, Matrix &B) {
     return C;
 }
 
-////////////////////////////////////
+Matrix Matrix::transpose() {
 
-Matrix mul(Matrix &A, Matrix &B) {
-    Matrix C(A.rows, B.cols);
+    Matrix M(cols, rows);
+
+    for (size_t i = 0; i < rows; ++i) {
+        for (size_t j = 0; j < cols; ++j) {
+            M[j][i] = m[i][j];
+        }
+    }
+
+    return M;
 }
+
+Matrix multiply(const Matrix &A, const Matrix &B) {
+
+    if (A.cols != B.rows) {
+        std::cerr << "multiply() incorrect shapes" << std::endl;
+        std::exit(-1);
+    }
+
+    Matrix tmp(A.rows, B.cols);
+
+    for (auto i = 0; i < A.rows; ++i) {
+        for (auto j = 0; j < B.cols; ++j) {
+            for (auto r = 0; r < B.rows; ++r) {
+                tmp[i][j] += A[i][r] * B[r][j];
+            }
+        }
+    }
+
+    return tmp;
+}
+
+Row::Row(std::vector<double> &_row, size_t _idx) {
+    this->idx = _idx;
+    this->row = Matrix(_row);
+}
+
+Row::~Row() = default;
+
+//void row_col_multiply(threadsafe_stack<std::vector<double>*> *rows, Matrix &B, Matrix &C) {
+//
+//    while (!rows->empty()) {
+//        std::shared_ptr<std::vector<double>*> row = rows->pop();
+//    }
+//
+//
+//}
+//
+//void test_mul(Matrix &A, Matrix &B) {
+//
+//    Matrix C(A.rows, B.cols);
+//    const int num_threads = 4;
+//    threadsafe_stack<std::vector<Row>> rows;
+//    std::vector<std::thread> threads;
+//
+//    for (auto ptr = A.m.rbegin(); ptr != A.m.rend(); ++ptr) {
+//        rows.push(&(*ptr));
+//    }
+//
+//    for (size_t i = 0; i < num_threads; ++i) {
+//        threads.emplace_back(std::thread(row_col_multiply, &rows, &B, &C));
+//    }
+//
+//    for (size_t i = 0; i < num_threads; ++i) {
+//        threads[i].join();
+//    }
+//
+//
+//}
 
 int main() {
 
-    Matrix A;
-    A.append({1, 2, 3, 4});
+    Matrix A, B;
+    A.append({1, 1, 1, 1});
     A.append({5, 6, 7, 8});
-
-    Matrix B = eye(4);
-
-    std::cout << A << std::endl;
-    std::cout << A.shape().first << " " << A.shape().second << std::endl;
+    B.append({5, 6, 7, 8});
 
 //    A.read_csv("table_3_1.csv", ',');
 //    std::cout << A.shape().first << " " << A.shape().second << std::endl;

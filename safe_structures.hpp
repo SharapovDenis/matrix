@@ -1,0 +1,8 @@
+//
+// Created by shdenis on 16/08/22.
+//
+
+#ifndef MATRIX_SAFE_STRUCTURES_HPP
+#define MATRIX_SAFE_STRUCTURES_HPP
+
+#endif //MATRIX_SAFE_STRUCTURES_HPP

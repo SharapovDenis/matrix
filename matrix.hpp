@@ -23,6 +23,8 @@ public:
 
     Matrix(size_t rows, size_t cols);
 
+    explicit Matrix(std::vector<double> &);
+
     Matrix(const Matrix &M);
 
     ~Matrix();
@@ -45,6 +47,8 @@ public:
 
     std::pair<size_t, size_t> shape();
 
+    Matrix transpose();
+
     Matrix &colchange(Matrix &col, size_t index);
 
     Matrix getcols(size_t from, size_t upto);
@@ -53,7 +57,7 @@ public:
 
     double maxval();
 
-    void read_csv(const char *filename, const char delim);
+    void read_csv(const char *filename, char delim);
 
     void append(const std::initializer_list<double> &);
 
@@ -65,15 +69,30 @@ public:
 
     friend std::ostream &operator<<(std::ostream &os, const Matrix &M);
 
+    friend Matrix multiply(const Matrix &, const Matrix &);
+
     friend Matrix eye(size_t s);
 
     friend Matrix hconcat(Matrix &A, Matrix &B);
 
     friend Matrix vconcat(Matrix &A, Matrix &B);
 
-    ///////////////////////////////////////////////////
+    friend class Row;
 
-    friend Matrix mul(Matrix &, Matrix &);
+//    friend test_mul(Matrix &, Matrix &);
 
-    friend void test_mul(Matrix &A, Matrix &B);
+};
+
+class Row {
+
+private:
+
+    size_t idx;
+    Matrix row;
+
+public:
+
+    Row(std::vector<double> &, size_t);
+    ~Row();
+
 };
