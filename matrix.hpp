@@ -6,6 +6,7 @@
 #include <fstream>
 #include <sstream>
 #include <thread>
+#include <mutex>
 
 static bool abs_compare(int a, int b);
 
@@ -16,6 +17,7 @@ private:
     size_t rows;
     size_t cols;
     std::vector<std::vector<double>> m;
+    mutable std::mutex mut;
 
 public:
 

@@ -439,59 +439,73 @@ Matrix multiply(const Matrix &A, const Matrix &B) {
     return tmp;
 }
 
-double multiply(const std::vector<double> &a, const std::vector<double> &b) {
+double multiply(const std::vector<double> &row, const std::vector<double> &col) {
 
-    if (a.size() != b.size()) {
+    if (row.size() != col.size()) {
         std::cerr << "multiply() incorrect vector sizes" << std::endl;
         std::exit(-1);
     }
 
     double tmp = 0;
 
-    for (size_t i = 0; i < a.size(); ++i) {
-        tmp += a[i] * b[i];
+    for (size_t i = 0; i < row.size(); ++i) {
+        tmp += row[i] * col[i];
     }
 
     return tmp;
 }
 
-//void row_col_multiply(threadsafe_stack<std::vector<double>*> *rows, Matrix &B, Matrix &C) {
-//
-//    while (!rows->empty()) {
-//        std::shared_ptr<std::vector<double>*> row = rows->pop();
-//    }
-//
-//
-//}
-//
-//
-//void test_mul(Matrix &A, Matrix &B) {
-//
-//    Matrix C(A.rows, B.cols);
-//    const int num_threads = 4;
-//    threadsafe_stack<std::vector<ThrRow>> rows;
-//    std::vector<std::thread> threads;
-//
-//    for (auto ptr = A.m.rbegin(); ptr != A.m.rend(); ++ptr) {
-//        rows.push(&(*ptr));
-//    }
-//
-//    for (size_t i = 0; i < num_threads; ++i) {
-//        threads.emplace_back(std::thread(row_col_multiply, &rows, &B, &C));
-//    }
-//
-//    for (size_t i = 0; i < num_threads; ++i) {
-//        threads[i].join();
-//    }
-//
-//}
+void row_col_multiply(threadsafe_stack<ThrRow> *rows, Matrix *B, Matrix *C) {
+
+    while (!rows->empty()) {
+        std::shared_ptr<ThrRow> row = rows->pop();
+        std::cout << row->idx << std::endl;
+    }
+
+
+}
+
+void test_mul(Matrix &A, Matrix &B) {
+
+    Matrix C(A.rows, B.cols);
+    const int num_threads = 4;
+    threadsafe_stack<ThrRow> stack_rows;
+    ThrRow mid_row{};
+    std::vector<std::thread> threads;
+
+    for (auto ptr = A.m.rbegin(); ptr != A.m.rend(); ++ptr) {
+        mid_row.idx = ptr - A.m.rbegin();
+        mid_row.row = &(*ptr);
+        stack_rows.push(mid_row);
+    }
+
+    for (size_t i = 0; i < num_threads; ++i) {
+        threads.emplace_back(std::thread(row_col_multiply, &stack_rows, &B, &C));
+    }
+
+    for (size_t i = 0; i < num_threads; ++i) {
+        threads[i].join();
+    }
+
+}
 
 int main() {
 
     Matrix A, B;
-    A.append({1, 1, 1, 1});
-    A.append({5, 6, 7, 8});
+    A.append({1, 2, 3, 4});
+    A.append({1, 2, 3, 4});
+    A.append({1, 2, 3, 4});
+    A.append({1, 2, 3, 4});
+    A.append({1, 2, 3, 4});
+    A.append({1, 2, 3, 4});
     B.append({5, 6, 7, 8});
+    B.append({5, 6, 7, 8});
+    B.append({5, 6, 7, 8});
+    B.append({5, 6, 7, 8});
+    B.append({5, 6, 7, 8});
+    B.append({5, 6, 7, 8});
+
+    test_mul(A, B);
 
 //    A.read_csv("table_3_1.csv", ',');
 //    std::cout << A.shape().first << " " << A.shape().second << std::endl;

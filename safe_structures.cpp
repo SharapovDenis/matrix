@@ -70,7 +70,9 @@ public:
 };
 
 struct empty_stack: std::exception {
-    const char* what() const throw();
+    const char* what() const noexcept {
+        return "empty stack exception";
+    }
 };
 
 template<typename T>
